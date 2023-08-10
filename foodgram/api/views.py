@@ -1,7 +1,6 @@
 from django.db.models import Sum
-from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import HttpResponse, get_object_or_404
-
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -18,8 +17,8 @@ from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              ShoppingListSerializer, SubscribeSerializer,
                              TagSerializer, UserProfileSerializer)
 from api.utils import model_object_create, model_object_delete
-from recipes.models import (Favorite, Ingredient, IngredientRecipe,
-                            Recipe, ShoppingList, Tag)
+from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                            ShoppingList, Tag)
 from users.models import Follow, User
 
 
@@ -97,7 +96,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[IsAuthenticated, ])
     def download_shopping_cart(self, request):
         user = request.user
-        # recipes = user.shopping.all()
         ingredients = IngredientRecipe.objects.filter(
             recipe__shopping__user=user)
         total_result = ingredients.values(

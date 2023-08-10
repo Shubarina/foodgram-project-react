@@ -1,13 +1,11 @@
-import base64
 import webcolors
-
-from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from recipes.models import (Favorite, Ingredient, IngredientRecipe,
-                            Recipe, ShoppingList, Tag)
+from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                            ShoppingList, Tag)
 from users.models import Follow, User
 
 
@@ -100,17 +98,6 @@ class Hex2NameColor(serializers.Field):
         return data
 
 
-class Base64ImageField(serializers.ImageField):
-
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-        return super().to_internal_value(data)
-
-
 class TagSerializer(serializers.ModelSerializer):
     """
     Сериализатор для просмотра информации о тегах.
@@ -130,10 +117,8 @@ class IngredientSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Ingredient
-        fields = '__all__'
+        fields = ('id', 'name', 'measurement_unit')
 
-
-# Сериализаторы для рецептов
 
 class IngredientRecipeGetSerializer(serializers.ModelSerializer):
     """
@@ -204,11 +189,40 @@ class RecipePostSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
                                               many=True)
     image = Base64ImageField(required=False)
+    cooking_time = serializers.IntegerField()
 
     class Meta:
         model = Recipe
         fields = ('name', 'image', 'text', 'ingredients',
                   'tags', 'cooking_time')
+
+    def validate_tags(self, value):
+        if not value:
+            raise serializers.ValidationError('нет тегов')
+        tag_list = []
+        for tag in value:
+            if tag in tag_list:
+                raise serializers.ValidationError('Этот тег уже выбран')
+            tag_list.append(tag)
+        return tag_list
+
+    def validate_ingredients(self, value):
+        if not value:
+            raise serializers.ValidationError('Из чего же мы будем готовить?')
+        ingredients_list = []
+        for ingredient in value:
+            if ingredient['id'] in ingredients_list:
+                raise serializers.ValidationError('Этот ингредиент уже выбран')
+            if ingredient['quantity'] == 0:
+                raise serializers.ValidationError(
+                    'Количество должно быть больше 0')
+            ingredients_list.append(ingredient['id'])
+        return value
+
+    def validate_cooking_time(self, value):
+        if value == 0:
+            raise serializers.ValidationError('Добавим хотя бы минутку')
+        return value
 
     def create(self, validated_data):
         request = self.context.get('request')
