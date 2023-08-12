@@ -4,19 +4,26 @@ from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingList, Tag)
 
 
+class IngredientRecipeInLine(admin.TabularInline):
+    model = IngredientRecipe
+    extra = 4
+
+
+class TagRecipeInLine(admin.TabularInline):
+    model = Recipe.tags.through
+
+
 class TagAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'color')
     list_display_links = ('name',)
+    inlines = [TagRecipeInLine, ]
 
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'measurement_unit')
     list_display_links = ('name',)
     list_filter = ('name',)
-
-
-class IngredientRecipeInLine(admin.TabularInline):
-    model = IngredientRecipe
+    inlines = [IngredientRecipeInLine, ]
 
 
 class RecipeAdmin(admin.ModelAdmin):
@@ -24,7 +31,8 @@ class RecipeAdmin(admin.ModelAdmin):
                     'pub_date', 'favorite_count')
     list_display_links = ('name',)
     list_filter = ('author', 'name', 'tags')
-    inlines = [IngredientRecipeInLine, ]
+    inlines = [IngredientRecipeInLine, TagRecipeInLine]
+    exclude = ['tags']
 
     @admin.display(description='В избранном')
     def favorite_count(self, obj):

@@ -1,4 +1,3 @@
-import webcolors
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -85,25 +84,11 @@ class UserProfileSerializer(UserFoodSerializer):
                                         context={'request': request}).data
 
 
-class Hex2NameColor(serializers.Field):
-
-    def to_representation(self, value):
-        return value
-
-    def to_internal_value(self, data):
-        try:
-            data = webcolors.hex_to_name(data)
-        except ValueError:
-            raise serializers.ValidationError('Для этого цвета нет имени')
-        return data
-
-
 class TagSerializer(serializers.ModelSerializer):
     """
     Сериализатор для просмотра информации о тегах.
     По эндпоинту /tags/ GET-запрос.
     """
-    color = Hex2NameColor()
 
     class Meta:
         model = Tag
@@ -276,7 +261,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = '__all__'
+        fields = ('reader', 'author')
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
