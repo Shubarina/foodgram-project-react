@@ -1,13 +1,11 @@
-# FROM python:3.9-slim
+FROM python:3.9-slim
 
-# WORKDIR /app
+WORKDIR /app
 
-# COPY requirements.txt .
+COPY requirements.txt .
 
-# RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install -r requirements.txt --no-cache-dir
 
-# COPY . .
+COPY . .
 
-# CMD ["python", "manage.py", "runserver", "0:8000"]
-
-# CMD ["gunicorn", "--bind", "0.0.0.0:9000", "kittygram_backend.wsgi"]
+CMD ["gunicorn", "--bind", "0.0.0.0:9000", "foodgram.wsgi"]

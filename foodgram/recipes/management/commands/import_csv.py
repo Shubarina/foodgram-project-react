@@ -12,7 +12,7 @@ class Command(BaseCommand):
         parser.add_argument('--path', type=str)
 
     def handle(self, *args, **kwargs):
-        path = 'C:/Dev/foodgram-project-react/data/ingredients.csv'
+        path = 'data/ingredients.csv'
         with open(path, 'rt', encoding='utf-8') as file:
             reader = csv.reader(file, delimiter=',')
             for row in reader:

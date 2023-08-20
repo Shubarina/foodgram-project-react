@@ -3,12 +3,11 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.filters import RecipeFilter
+from api.filters import IngredientFilter, RecipeFilter
 from api.mixins import CustomListViewSet
 from api.pagination import FoodgramPagination
 from api.permissions import AdminAuthorOrReadOnly, AdminOrReadOnly
@@ -22,7 +21,7 @@ from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
 from users.models import Follow, User
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
+class TagViewSet(viewsets.ModelViewSet):
     """
     Получение списка тегов или информации о теге по уникальному идентификатору.
     Для /api/tags/.
@@ -42,8 +41,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
-    filter_backends = (SearchFilter,)
+    filter_backends = (IngredientFilter,)
     search_fields = ('^name',)
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -100,7 +100,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__shopping__user=user)
         total_result = ingredients.values(
             'ingredient__name', 'ingredient__measurement_unit').order_by(
-            'ingredient__name').annotate(total=Sum('quantity'))
+            'ingredient__name').annotate(total=Sum('amount'))
         shopping_list = []
         for ingredient in total_result:
             name = ingredient['ingredient__name']

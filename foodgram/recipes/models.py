@@ -124,7 +124,7 @@ class IngredientRecipe(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Рецепт'
     )
-    quantity = models.PositiveSmallIntegerField(
+    amount = models.PositiveSmallIntegerField(
         default=0,
         verbose_name='Количество',
         validators=((MinValueValidator(settings.MIN_QUANTITY),
@@ -137,7 +137,7 @@ class IngredientRecipe(models.Model):
         ordering = ('ingredient',)
 
     def __str__(self):
-        return f'{self.quantity} {self.ingredient} для {self.recipe}'
+        return f'{self.amount} {self.ingredient} для {self.recipe}'
 
 
 class BaseUserRecipeModel(models.Model):

@@ -64,7 +64,7 @@ class UserFoodSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(UserFoodSerializer):
     """
-    Сериализатор для выдачи информации об авторе для подписки на него.
+    Сериализатор для выдачи информации об авторе при подписке на него.
     """
     recipes = serializers.SerializerMethodField()
 
@@ -77,8 +77,10 @@ class UserProfileSerializer(UserFoodSerializer):
 
     def get_recipes(self, obj):
         request = self.context['request']
+        recipes = Recipe.objects.filter(author=obj)
         recipes_limit = request.query_params.get('recipes_limit')
-        recipes = Recipe.objects.filter(author=obj)[:int(recipes_limit)]
+        if recipes_limit:
+            recipes = recipes[:int(recipes_limit)]
         return FavoriteRecipeSerializer(recipes,
                                         many=True,
                                         context={'request': request}).data
@@ -116,7 +118,7 @@ class IngredientRecipeGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientRecipe
-        fields = ('id', 'name', 'quantity', 'measurement_unit')
+        fields = ('id', 'name', 'amount', 'measurement_unit')
 
 
 class IngredientRecipePostSerializer(serializers.ModelSerializer):
@@ -124,11 +126,11 @@ class IngredientRecipePostSerializer(serializers.ModelSerializer):
     Сериализатор для добавления ингредиентов в рецепт.
     """
     id = serializers.IntegerField()
-    quantity = serializers.IntegerField()
+    amount = serializers.IntegerField()
 
     class Meta:
         model = IngredientRecipe
-        fields = ('id', 'quantity')
+        fields = ('id', 'amount')
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
@@ -198,7 +200,7 @@ class RecipePostSerializer(serializers.ModelSerializer):
         for ingredient in value:
             if ingredient['id'] in ingredients_list:
                 raise serializers.ValidationError('Этот ингредиент уже выбран')
-            if ingredient['quantity'] == 0:
+            if ingredient['amount'] == 0:
                 raise serializers.ValidationError(
                     'Количество должно быть больше 0')
             ingredients_list.append(ingredient['id'])
@@ -218,11 +220,11 @@ class RecipePostSerializer(serializers.ModelSerializer):
         ingredients_list = []
         for ingredient in ingredients:
             current_ingredient = Ingredient.objects.get(id=ingredient['id'])
-            quantity = ingredient['quantity']
+            amount = ingredient['amount']
             ingredient_recipe = IngredientRecipe(
                 recipe=recipe,
                 ingredient=current_ingredient,
-                quantity=quantity
+                amount=amount
             )
             ingredients_list.append(ingredient_recipe)
         IngredientRecipe.objects.bulk_create(ingredients_list)
@@ -233,21 +235,20 @@ class RecipePostSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         instance.tags.clear()
         instance.tags.set(tags)
-        instance.ingredients.all().delete()
+        IngredientRecipe.objects.filter(recipe=instance).delete()
         super().update(instance, validated_data)
         ingredients_list = []
         for ingredient in ingredients:
             current_ingredient = Ingredient.objects.get(id=ingredient['id'])
-            quantity = ingredient['quantity']
+            amount = ingredient['amount']
             ingredient_recipe = IngredientRecipe(
                 recipe=instance,
                 ingredient=current_ingredient,
-                quantity=quantity
+                amount=amount
             )
             ingredients_list.append(ingredient_recipe)
         IngredientRecipe.objects.bulk_create(ingredients_list)
-        instance.save()
-        return instance
+        return super().update(instance, validated_data)
 
     def to_representation(self, instance):
         request = self.context['request']

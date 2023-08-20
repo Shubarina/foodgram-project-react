@@ -40,7 +40,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 class IngredientRecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'ingredient', 'recipe', 'quantity')
+    list_display = ('id', 'ingredient', 'recipe', 'amount')
 
 
 class FavoriteAdmin(admin.ModelAdmin):
