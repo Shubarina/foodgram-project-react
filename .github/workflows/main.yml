@@ -130,7 +130,6 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         source: 'docker-compose.yml'
         target: 'foodgram'
-        strip_components: 1
 
     - name: Executing remote ssh commands to deploy
       uses: appleboy/ssh-action@master
