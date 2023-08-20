@@ -18,7 +18,7 @@ from api.serializers import (FavoriteSerializer, IngredientSerializer,
 from api.utils import model_object_create, model_object_delete
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingList, Tag)
-from users.models import Follow, User
+from foodgram.users.models import Follow, User
 
 
 class TagViewSet(viewsets.ModelViewSet):

@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingList, Tag)
-from users.models import Follow, User
+from foodgram.users.models import Follow, User
 
 
 class CustomDjoserUsersGetSerializer(UserSerializer):
