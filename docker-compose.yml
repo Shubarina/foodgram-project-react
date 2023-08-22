@@ -25,15 +25,16 @@ services:
   frontend:
     image: shubaru/foodgram_frontend
     env_file: .env
-    command: cp -r /app/build/. /frontend_static/
-    volumes:
-      - static:/frontend_static
+    volumes: 
+      - ../frontend/:/app/result_build/
 
   nginx:
     image: shubaru/foodgram_gateway
+    env_file: .env
     ports:
       - 9000:80
     volumes:
       - ../docs/:/usr/share/nginx/html/api/docs/
+      - ../frontend/build:/usr/share/nginx/html/
       - static:/app/static/
       - media:/app/media/
