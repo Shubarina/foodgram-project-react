@@ -1,6 +1,10 @@
 # Дипломный проект
 ## Сервис рецептов FOODGRAM
 
+```
+https://shubanoid.hopto.org
+```
+
 ### Описание
 Вкус жизни начинается здесь!
 Проект Foodgram это социальная сеть для обмена любимыми вкусными рецептами.
@@ -64,3 +68,8 @@ python3 manage.py runserver
 
 ### Авторы
 Анна Шубарина
+
+Суперпользователь:
+login: superanna
+email: shuba@mail.ru
+password: 230983
