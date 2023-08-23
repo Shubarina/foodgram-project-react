@@ -74,5 +74,7 @@ python3 manage.py runserver
 
 Суперпользователь:
 login: superanna
+```
 email: shuba@mail.ru
+```
 password: 230983
