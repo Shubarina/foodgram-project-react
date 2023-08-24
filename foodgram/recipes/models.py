@@ -62,7 +62,7 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
 
-    REGEX = '.*[a-zA-Z].*'
+    REGEX = '.*[a-яA-ЯЁё].*'
 
     author = models.ForeignKey(
         User,
