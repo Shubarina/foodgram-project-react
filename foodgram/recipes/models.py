@@ -1,6 +1,7 @@
 from colorfield.fields import ColorField
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
 from users.models import User
 
@@ -60,6 +61,9 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+
+    REGEX = '.*[a-zA-Z].*'
+
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -70,7 +74,9 @@ class Recipe(models.Model):
         max_length=settings.TITLE_LENGTH,
         null=False,
         blank=False,
-        verbose_name='Название блюда'
+        verbose_name='Название блюда',
+        validators=[RegexValidator(REGEX),
+                    'В названии рецепта совсем нет букв']
     )
     image = models.ImageField(
         upload_to='recipes/',
