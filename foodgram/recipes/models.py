@@ -75,8 +75,9 @@ class Recipe(models.Model):
         null=False,
         blank=False,
         verbose_name='Название блюда',
-        validators=[RegexValidator(REGEX),
-                    'В названии рецепта совсем нет букв']
+        validators=[RegexValidator(
+            regex=REGEX,
+            message='В названии рецепта совсем нет букв')]
     )
     image = models.ImageField(
         upload_to='recipes/',
