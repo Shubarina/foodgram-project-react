@@ -8,36 +8,42 @@
 Автоматизация деплоя проекта (CI/CD) настроена с применением Github Actions, pipeline составлена в файле `.github/workflow`.  
 В проекте использованы следующие технологии: Python, Django, Django REST framework, Nginx, Gunicorn, Docker, PostgreSQL, CI/CD  
 
-## Как запустить проект локально:
-1. Клонировать репозиторий и перейти в него в командной строке:
+## Как запустить проект на удаленном сервере:
+1. Клонируйте репозиторий:
 ```
 git clone https://github.com/Shubarina/foodgram-project-react.git
-cd foodgram
 ```
-2. Cоздать и активировать виртуальное окружение, обновить пакетный менеджер:
-```
-python3 -m venv env
-```
-* Если у вас Linux/macOS
-    ```
-    source env/bin/activate
-    ```
-* Если у вас windows
-    ```
-    source env/scripts/activate
-    ```
-3. Обновить пакетный менеджер и установить зависимости из файла requirements.txt:
-```
-python3 -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-4. Выполнить миграции и запустить проект:
-```
-python3 manage.py migrate
-python3 manage.py runserver
-```
-## Как развернуть проект на удаленном сервере
-
-
+2. На сервере установлен Docker и Docker Compose.
+3. Скопируйте на сервер файлы `docker-compose.yml` и `nginx.conf` из директории infra. Отредактируйте данные IP своего сервера.
+4. Создайте файл `.env` и впишите в него переменные:
+   ```DB_ENGINE=<django.db.backends.postgresql>
+      DB_NAME=<имя базы данных postgres>
+      DB_USER=<пользователь бд>
+      DB_PASSWORD=<пароль>
+      DB_HOST=<db>
+      DB_PORT=<5432>
+      SECRET_KEY=<секретный ключ проекта django>
+   ```
+6. На сервере соберите docker-compose и после успешного запуска соберите статику, примените миграции и создайте суперпользователя:
+   ```
+   sudo docker-compose up -d --build
+   sudo docker-compose exec backend python manage.py collectstatic
+   sudo docker-compose exec backend python manage.py migrate
+   sudo docker-compose exec backend python manage.py createsuperuser
+   ```
+7. Для работы с Github Actions необходимо создать переменные окружения в разделе Secrets репозитория проекта:
+   ```
+   SECRET_KEY              # секретный ключ Django проекта
+   DOCKER_PASSWORD         # пароль от Docker Hub
+   DOCKER_USERNAME         # логин Docker Hub
+   HOST                    # публичный IP сервера
+   USER                    # имя пользователя на сервере
+   PASSPHRASE              # *если ssh-ключ защищен паролем
+   SSH_KEY                 # приватный ssh-ключ
+   TELEGRAM_TO             # ID телеграм-аккаунта для отправки сообщения
+   TELEGRAM_TOKEN          # токен бота, посылающего сообщение
+   ```
+   **Запуск workflow стартует после каждого обновления репозитория (push в ветку master)**
+   
 ## Авторы
 Анна Шубарина
