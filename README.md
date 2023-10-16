@@ -14,7 +14,7 @@
 git clone https://github.com/Shubarina/foodgram-project-react.git
 ```
 2. На сервере установлен Docker и Docker Compose.
-3. Скопируйте на сервер файлы `docker-compose.yml` и `nginx.conf` из директории infra. Отредактируйте данные IP своего сервера.
+3. Скопируйте на сервер файлы `docker-compose.yml` и `nginx.conf` из директории nginx. Отредактируйте данные IP своего сервера.
 4. Создайте файл `.env` и впишите в него переменные:
    ```DB_ENGINE=<django.db.backends.postgresql>
       DB_NAME=<имя базы данных postgres>
